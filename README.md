@@ -1,24 +1,26 @@
 # dotfiles-hypr
 
-My Arch Linux + Hyprland configuration files.
+My Arch-based Linux + Hyprland configuration files.
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/xjung/dotfiles-hypr.git ~/dotfiles-hypr
+git clone https://github.com/xjung/dotfiles-hypr.git
 cd ~/dotfiles-hypr
 ```
 
-### Packages
+#### Packages
 ```bash
-sudo pacman -S --needed - < ~/.config/pacman.list
-
+pacman -S --needed - < ~/.config/pacman.list
+```
+```bash
 yay -S --needed - < ~/.config/aur.list
-
+```
+```bash
 cargo install $(cat ~/.config/cargo.list)
 ```
 
-### Config and scripts
+#### Config and scripts
 ```bash
 cp -r .config/* ~/.config/
 cp -r .local/* ~/.local/
@@ -31,22 +33,24 @@ cp .sqliterc ~/
 ## Structure
 ```
 ~/.config/
-├── hypr/         # Hyprland window manager
-├── waybar/       # Status bar
-├── kitty/        # Terminal emulator
-├── nvim/         # Neovim editor
-├── wofi/         # Application launcher
-├── wlogout/      # Logout menu
-├── btop/         # System monitor
-├── ncmpcpp/      # MPD client
-├── yazi/         # File manager
-├── starship.toml # Shell prompt
-└── Wallpapers/   # Wallpapers
+├── hypr/            # Hyprland window manager
+├── waybar/          # Status bar
+├── kitty/           # Terminal emulator
+├── nvim/            # Neovim editor
+├── wofi/            # Application launcher
+├── wlogout/         # Logout menu
+├── btop/            # System monitor
+├── ncmpcpp/         # MPD client
+├── yazi/            # File manager
+├── starship.toml    # Shell prompt
+└── Wallpapers/      # Wallpapers
 
-~/.local/bin/     # Custom scripts
-~/.zshrc          # Zsh shell
-~/.tmux.conf      # Tmux multiplexer
-~/.sqliterc       # Sqlite config
+~/.local/bin/        # Custom scripts
+└── tmux-sessionizer
+
+~/.zshrc             # Zsh shell
+~/.tmux.conf         # Tmux multiplexer
+~/.sqliterc          # Sqlite config
 ```
 
 ## Screenshots

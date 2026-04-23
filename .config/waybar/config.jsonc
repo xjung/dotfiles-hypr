@@ -1,0 +1,163 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 36,
+    "spacing": 5,
+    "margin-top": 4,
+    "margin-left": 8,
+    "margin-right": 8,
+    "margin-bottom": 0,
+    "output": ["eDP-1", "HDMI-A-1"],
+
+    "modules-center": [
+        "clock#time",
+        "hyprland/workspaces",
+        "pulseaudio",
+        "pulseaudio#mic",
+        "clock#date"
+    ],
+
+    "modules-left": [
+        "bluetooth",
+        "mpris"
+    ],
+
+    "modules-right": [
+        "tray",
+        "network",
+        "battery"
+    ],
+
+    "hyprland/window": {
+    	"format": "{title}",
+    	"rewrite": {
+    		"(.*) - Mozilla Firefox": "🌎 $1",
+    		"(.*) - zsh": "> [$1]"
+    	}
+    },
+
+    "bluetooth": {
+    	"format": "{icon}",
+    	"format-icons": ["󰂲", "󰂯"],
+        "format-connected": " {device_alias}",
+    	"tooltip-format": "{num_connections} connected",
+    	"tooltip-format-connected": "{device_enumerate}",
+    	"tooltip-format-enumerate-connected": "{device_alias} ({device_battery_percentage}%)\t{device_address}",
+        "on-click": "kitty --class centered bluetui"
+    },
+
+    "mpris": {
+        "format": "{player_icon}  {dynamic}",
+        "format-paused": "{status_icon}  {dynamic}",
+        "tooltip": false,
+        "title-len": 35,
+        "artist-len": 35,
+        "dynamic-len": 40,
+        "dynamic-order": ["title", "artist", "album"],
+        "album-len": 0,
+        "length-len": 0,
+        "player-icons": {
+            "default": "▶",
+            "mpv": "🎵",
+            "spotify": "",
+            "firefox": "",
+            "chromium": ""
+        },
+        "status-icons": {
+            "paused": "⏸"
+        }
+    },
+
+    "clock#time": {
+        "tooltip": false,
+        "format": "{:%H:%M}"
+    },
+
+    "clock#date": {
+        "format": "{:%A, %b %d}",
+        "format-alt": "{:%a %b %d %Y}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "locale": "en_GB.UTF-8",
+        "calendar": {
+            "mode": "month",
+            "format": {
+                "months": "<span color='#ffead4'><b>{}</b></span>",
+                "days": "<span color='#ecc6d9'>{}</span>",
+                "weeks": "<span color='#99ffdd'><b>W{:%V}</b></span>",
+                "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+                "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        },
+        "actions": {
+        	"on-click-right": "mode",
+        	"on-click-forward": "tz_up",
+        	"on-click-backward": "tz_down",
+        	"on-scroll-up": "shift_up",
+        	"on-scroll-down": "shift_down"
+        }
+    },
+
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9"
+        },
+        "format": "{name}"
+    },
+
+    "network": {
+        "format-wifi": "{icon} {signalStrength}%",
+        "format-icons": ["󰤯 ", "󰤟 ", "󰤢 ", "󰤥 ", "󰤨 "],
+        "format-ethernet": "🖧 ",
+        "format-disconnected": "⚠",
+        "tooltip-format": "{essid}, {gwaddr}",
+        "on-click": "kitty --class centered wlctl"
+    },
+
+    "pulseaudio": {
+        "format-icons": {
+			"default": [ "󰕿", "󰖀", "󰕾" ],
+			"default-muted": "󰝟",
+			"headphone": "󰋋",
+			"headphone-muted": "󰟎",
+			"headset": "󰋎",
+			"headset-muted": "󰋐"
+		},
+        "format": "{icon}",
+        "tooltip-format": "{volume}%: {desc}",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 50%",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    },
+
+    "pulseaudio#mic": {
+        "format": "{format_source}",
+        "format-source": "󰍬",
+        "format-source-muted": "󰍭",
+        "tooltip": false,
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-icons": {
+            "charging": "󰂄",
+            "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+        },
+        "tooltip": true,
+        "tooltip-format-charging": "Charging, {time} ({cycles} cycles)",
+        "tooltip-format-discharging": "Discharging, {time} remaining ({cycles} cycles)",
+        "tooltip-format-full": "Fully charged ({cycles} cycles)",
+        "tooltip-format-plugged": "Plugged ({cycles} cycles)"
+    }
+}

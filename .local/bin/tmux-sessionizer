@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+    project_dir=$1
+else
+    project_dir=$(find ~/dev -mindepth 1 -maxdepth 1 -type d | fzf)
+fi
+
+if [[ -z $project_dir ]]; then
+    exit 0
+fi
+
+project_dir_name=$(basename "$project_dir")
+tmux_running=$(pgrep tmux)
+
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]] \
+   || ! tmux has-session -t $project_dir_name 2>/dev/null; then
+
+    tmux new-session -d -s $project_dir_name -c $project_dir
+
+    if [ -f "$project_dir/tmux-session" ]; then
+        source "$project_dir/tmux-session"
+    fi
+fi
+
+tmux attach-session -t $project_dir_name

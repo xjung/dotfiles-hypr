@@ -10,41 +10,85 @@ function ColorMyPencils(color)
     vim.api.nvim_set_hl(0, "CursorColumn", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "VertSplit", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "LineNr", { bg = "NONE" })
+
+    ---vim.api.nvim_set_hl(0, 'Search', { bg = '#4a4a4a' })
+
+    ---vim.api.nvim_set_hl(0, "TSFuncMacro", { fg = "#e5b567" })
+    ---vim.api.nvim_set_hl(0, "Comment", { fg = '#54706f', italic = true })
 end
 
 return {
 
     {
-      "neanias/everforest-nvim",
-      version = false,
-      lazy = false,
-      priority = 1000, -- make sure to load this before all the other start plugins
-      -- Optional; default configuration will be used if setup isn't called.
-      config = function()
-        require("everforest").setup({
-            transparent_background_level = 2,
-            })
-      end,
-    },
-
-    {
-      'projekt0n/github-nvim-theme',
-      name = 'github-theme',
-      lazy = false, -- make sure we load this during startup if it is your main colorscheme
-      priority = 1000, -- make sure to load this before all the other start plugins
-      config = function()
-        require('github-theme').setup({
-          -- ...
-        })
-      end,
-    },
-
-    {
-        "ramojus/mellifluous.nvim",
-        -- version = "v0.*", -- uncomment for stable config (some features might be missed if/when v1 comes out)
-        config = function()
-            require("mellifluous").setup({}) -- optional, see configuration section.
-        end,
+        "catppuccin/nvim",
+        flavour = "auto", -- latte, frappe, macchiato, mocha
+        background = { -- :h background
+            light = "latte",
+            dark = "mocha",
+        },
+        transparent_background = true, -- disables setting the background color.
+        float = {
+            transparent = true, -- enable transparent floating windows
+            solid = false, -- use solid styling for floating windows, see |winborder|
+        },
+        term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
+        dim_inactive = {
+            enabled = false, -- dims the background color of inactive window
+            shade = "dark",
+            percentage = 0.15, -- percentage of the shade to apply to the inactive window
+        },
+        no_italic = false, -- Force no italic
+        no_bold = false, -- Force no bold
+        no_underline = false, -- Force no underline
+        styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+            comments = { "italic" }, -- Change the style of comments
+            conditionals = { "italic" },
+            loops = {},
+            functions = {},
+            keywords = {},
+            strings = {},
+            variables = {},
+            numbers = {},
+            booleans = {},
+            properties = {},
+            types = {},
+            operators = {},
+            -- miscs = {}, -- Uncomment to turn off hard-coded styles
+        },
+        lsp_styles = { -- Handles the style of specific lsp hl groups (see `:h lsp-highlight`).
+            virtual_text = {
+                errors = { "italic" },
+                hints = { "italic" },
+                warnings = { "italic" },
+                information = { "italic" },
+                ok = { "italic" },
+            },
+            underlines = {
+                errors = { "underline" },
+                hints = { "underline" },
+                warnings = { "underline" },
+                information = { "underline" },
+                ok = { "underline" },
+            },
+            inlay_hints = {
+                background = true,
+            },
+        },
+        color_overrides = {},
+        custom_highlights = {},
+        default_integrations = true,
+        auto_integrations = false,
+        integrations = {
+            cmp = true,
+            gitsigns = true,
+            nvimtree = true,
+            notify = false,
+            mini = {
+                enabled = true,
+                indentscope_color = "",
+            },
+            -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+        },
     },
 
     {
@@ -59,130 +103,30 @@ return {
     },
 
     {
-        "Shatur/neovim-ayu",
-        config = function()
-            require('ayu').setup({
-                terminal = true,
-                mirage = true,
-                overrides = {
-                   Normal = { bg = "None" },
-                   NormalFloat = { bg = "none" },
-                   ---ColorColumn = { bg = "None" },
-                   SignColumn = { bg = "None" },
-                   Folded = { bg = "None" },
-                   FoldColumn = { bg = "None" },
-                   CursorLine = { bg = "None" },
-                   CursorColumn = { bg = "None" },
-                   VertSplit = { bg = "None" },
-               },
-           })
-        end
-    },
-
-    {
-        "erikbackman/brightburn.vim",
-    },
-
-    {
-        "folke/tokyonight.nvim",
-        lazy = false,
-        opts = {},
-        config = function()
-            ColorMyPencils()
-        end
-    },
-    {
-        "ellisonleao/gruvbox.nvim",
-        name = "gruvbox",
-        config = function()
-            require("gruvbox").setup({
-                terminal_colors = true, -- add neovim terminal colors
-                undercurl = true,
-                underline = false,
-                bold = true,
-                italic = {
-                    strings = false,
-                    emphasis = false,
-                    comments = false,
-                    operators = false,
-                    folds = false,
-                },
-                strikethrough = true,
-                invert_selection = false,
-                invert_signs = false,
-                invert_tabline = false,
-                invert_intend_guides = false,
-                inverse = true, -- invert background for search, diffs, statuslines and errors
-                contrast = "", -- can be "hard", "soft" or empty string
-                palette_overrides = {},
-                overrides = {},
-                dim_inactive = false,
-                transparent_mode = false,
-            })
-        end,
-    },
-    {
-        "folke/tokyonight.nvim",
-        config = function()
-            require("tokyonight").setup({
-                -- your configuration comes here
-                -- or leave it empty to use the default settings
-                style = "storm", -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
-                transparent = true, -- Enable this to disable setting the background color
-                terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
-                styles = {
-                    -- Style to be applied to different syntax groups
-                    -- Value is any valid attr-list value for `:help nvim_set_hl`
-                    comments = { italic = false },
-                    keywords = { italic = false },
-                    -- Background styles. Can be "dark", "transparent" or "normal"
-                    sidebars = "dark", -- style for sidebars, see below
-                    floats = "dark", -- style for floating windows
-                },
-            })
-        end
-    },
-
-    {
-        "rose-pine/neovim",
-        name = "rose-pine",
-        config = function()
-            require('rose-pine').setup({
-                disable_background = true,
-                styles = {
-                    italic = false,
-                },
-            })
-
-            ColorMyPencils();
-        end
-    },
-
-    {
         "RRethy/base16-nvim",
         config = function()
             require('base16-colorscheme').setup({
-                base00 = '#0e0e16', -- bg (background)
-                base01 = '#1a1a24', -- bg_alt (background highlight)
-                base02 = '#252532', -- float_bg (line numbers, selections)
-                base03 = '#707c8c', -- fg_dim (comments, virtual text)
-                base04 = '#858d95', -- keyword (dark foreground)
-                base05 = '#d8d8d8', -- fg (foreground)
-                base06 = '#b0c0e0', --
-                base07 = '#d8d8d8', -- fg (light background)
+                -- Warm Evening Study - increased contrast
+                base00 = '#100d14', -- bg (deeper, richer dark)
+                base01 = '#1d1924', -- bg_alt (clearer separation from bg)
+                base02 = '#2b2535', -- float_bg (more visible, still warm)
+                base03 = '#7a7480', -- fg_dim (brighter comments, easier to read)
+                base04 = '#706878', -- keyword (more present while staying muted)
+                base05 = '#e0d6c8', -- fg (brighter warm cream, crisp against dark bg)
+                base06 = '#ece2d2', --
+                base07 = '#f4ead8', -- fg (light background, warm and bright)
 
-                base08 = '#ffffff', -- variables
-                base09 = '#d1b77a', -- boolean/constant
-                base0A = '#d1b77a', -- type
-                base0B = '#54b06f', -- comment/added (green)
-                base0C = '#5fa6a6', -- hint/search_current
-                base0D = '#02a8ce', -- func/changed
-                base0E = '#f58080', -- keyword
-                base0F = '#aaaaaa', -- operator
+                base08 = '#e0b5a0', -- variables (more vivid rose clay)
+                base09 = '#e8a37e', -- boolean/constant (punchy terracotta)
+                base0A = '#96d0f5', -- type (bright light sky blue, clearly visible)
+                base0B = '#8cbc90', -- comment/added (fresher sage green)
+                base0C = '#42c0e2', -- hint/search_current (brighter medium blue)
+                base0D = '#5f9cd6', -- func/changed (strong deep blue, function names pop)
+                base0E = '#a098b8', -- keyword (more visible violet-gray, but still muted)
+                base0F = '#bfb2a0', -- operator (clear warm stone)
             })
 
             ColorMyPencils();
         end,
-    },
-
-}
+        },
+    }

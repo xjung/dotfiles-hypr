@@ -27,15 +27,6 @@ alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip --color=auto'
 
-# Additional useful aliases
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias df='df -h'
-alias du='du -h'
-alias free='free -h'
-alias mkdir='mkdir -p'
-
 # Bindings
 bindkey '\e[3~' delete-char              # Delete key (forward delete)
 bindkey '^?' backward-delete-char        # Backspace key (backward delete)

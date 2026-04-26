@@ -35,6 +35,7 @@ cp .sqliterc ~/
 ~/.config/
 ├── hypr/            # Hyprland window manager
 ├── waybar/          # Status bar
+├── mako/            # Notification daemon
 ├── kitty/           # Terminal emulator
 ├── nvim/            # Neovim editor
 ├── wofi/            # Application launcher
@@ -54,3 +55,4 @@ cp .sqliterc ~/
 ```
 
 ## Screenshots
+![Fastfetch](screenshots/Desktop_1.png)

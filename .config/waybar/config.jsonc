@@ -138,6 +138,10 @@
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
     },
 
+   "tray": {
+        "spacing": 5,
+    },
+
     "battery": {
         "format": "{icon} {capacity}%",
         "format-icons": {

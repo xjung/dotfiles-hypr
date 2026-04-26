@@ -56,3 +56,4 @@ cp .sqliterc ~/
 
 ## Screenshots
 ![Fastfetch](screenshots/Desktop_1.png)
+![File manager, editor](screenshots/Desktop_2.png)

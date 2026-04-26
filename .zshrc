@@ -85,7 +85,7 @@ autoload -Uz colors
 colors
 
 # Correction for commands
-setopt CORRECT_ALL
+# setopt CORRECT_ALL
 
 # Plugins
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh

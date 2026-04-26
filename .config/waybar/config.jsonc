@@ -8,13 +8,13 @@
     "margin-right": 8,
     "margin-bottom": 0,
     "output": ["eDP-1", "HDMI-A-1"],
+    "reload_style_on_change": true,
 
     "modules-center": [
-        "clock#time",
         "hyprland/workspaces",
         "pulseaudio",
         "pulseaudio#mic",
-        "clock#date"
+        "clock#time"
     ],
 
     "modules-left": [
@@ -69,14 +69,8 @@
     },
 
     "clock#time": {
-        "tooltip": false,
-        "format": "{:%H:%M}"
-    },
-
-    "clock#date": {
-        "format": "{:%A, %b %d}",
-        "format-alt": "{:%a %b %d %Y}",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "format": "<b>{:%H:%M</b> <span size='x-small'>%d/%m}</span>",
+        "tooltip-format": "<tt>{calendar}</tt>",
         "locale": "en_GB.UTF-8",
         "calendar": {
             "mode": "month",
@@ -89,11 +83,7 @@
             }
         },
         "actions": {
-        	"on-click-right": "mode",
-        	"on-click-forward": "tz_up",
-        	"on-click-backward": "tz_down",
-        	"on-scroll-up": "shift_up",
-        	"on-scroll-down": "shift_down"
+        	"on-click-right": "mode"
         }
     },
 

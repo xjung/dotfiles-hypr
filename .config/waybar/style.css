@@ -8,7 +8,7 @@
 }
 
 window#waybar {
-    background: rgba(0, 0, 0, 0);
+    background: rgba(168, 101, 152, 0.0);
     color: #ffffff;
     border-radius: 30px;
     transition-property: background-color;
@@ -20,50 +20,38 @@ window#waybar.hidden {
 }
 
 #clock.time {
+    background: rgba(30, 30, 40, 0.0);
+    border-radius: 20px;
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
-    background: transparent;
-    padding: 0 8px;
-    margin: 4px 0;
-}
-
-#clock.date {
-    font-size: 12px;
-    font-weight: 600;
-    color: #ffffff;
-    background: transparent;
-    padding: 0 8px;
-    margin: 4px 0;
+    padding: 0 12px;
 }
 
 /* Workspaces styling */
 #workspaces {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
-    padding: 2px 5px;
-    margin: 4px 0;
+    padding: 0 4px;
+    margin: 5px 4px;
 }
 
 #workspaces button {
-    padding: 0 8px;
+    padding: 0 4px;
     background: transparent;
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 20px;
     min-width: 25px;
     box-shadow: inset 0 -3px transparent;
-    transition: all 0.3s ease;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 -1px #ffffff;
+    background: rgba(255, 255, 255, 0.9);
 }
 
 #workspaces button.active {
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: inset 0 -1px #ffffff;
+    background: rgba(255, 255, 255, 0.9);
+    color: rgba(0, 0, 0, 0.9);
 }
 
 #workspaces button.urgent {
@@ -118,7 +106,7 @@ window#waybar.hidden {
 }
 
 #mpris {
-    background: linear-gradient(270deg, rgba(45, 45, 55, 0.0), rgba(255, 255, 255, 0.0));
+    background: rgba(30, 30, 40, 1.0);
     border-radius: 20px;
     padding: 0 10px;
     margin: 4px 0;
@@ -136,19 +124,19 @@ tooltip label {
 }
 
 .modules-left {
-    background: rgba(30, 30, 40, 1.0);
+    background: rgba(30, 30, 40, 0.0);
     border-radius: 15px;
     padding: 2px 5px;
 }
 
 .modules-center {
-    background: rgba(30, 30, 40, 1.0);
+    background: rgba(30, 30, 40, 0.0);
     border-radius: 15px;
     padding: 2px 5px;
 }
 
 .modules-right {
-    background: rgba(30, 30, 40, 1.0);
+    background: rgba(30, 30, 40, 0.0);
     border-radius: 15px;
     padding: 2px 5px;
 }

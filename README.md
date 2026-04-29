@@ -47,6 +47,7 @@ cp .sqliterc ~/
 └── Wallpapers/      # Wallpapers
 
 ~/.local/bin/        # Custom scripts
+├── pacman-fzf
 └── tmux-sessionizer
 
 ~/.zshrc             # Zsh shell

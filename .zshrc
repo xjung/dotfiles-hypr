@@ -6,7 +6,8 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # Environment
-
+export TERMINAL=kitty
+export EDITOR=nvim
 # Default        "*?_-.[]~=/&;!#$%^(){}<>"
 export WORDCHARS="*?_-[]~=&!#$%^(){}<>"
 

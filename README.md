@@ -48,6 +48,7 @@ cp .sqliterc ~/
 
 ~/.local/bin/        # Custom scripts
 ├── pacman-fzf
+├── systemctl-fzf-services
 └── tmux-sessionizer
 
 ~/.zshrc             # Zsh shell

@@ -47,8 +47,8 @@
     },
 
     "mpris": {
-        "format": "{player_icon}  {dynamic}",
-        "format-paused": "{status_icon}  {dynamic}",
+        "format": "{player_icon} {dynamic}",
+        "format-paused": "{status_icon} {dynamic}",
         "tooltip": false,
         "title-len": 35,
         "artist-len": 35,
@@ -106,8 +106,8 @@
 
     "network": {
         "format-wifi": "{icon} {signalStrength}%",
-        "format-icons": ["󰤯 ", "󰤟 ", "󰤢 ", "󰤥 ", "󰤨 "],
-        "format-ethernet": "🖧 ",
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+        "format-ethernet": "🖧",
         "format-disconnected": "⚠",
         "tooltip-format": "{essid}, {gwaddr}",
         "on-click": "kitty --class centered wlctl"

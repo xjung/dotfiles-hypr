@@ -1,0 +1,7 @@
+#!/bin/bash
+
+systemctl list-units --all --no-legend | \
+    sed 's/^[●○] //' | \
+    grep '.*\.service' | \
+    awk '{print $1}' | \
+    fzf --preview 'systemctl status {1}'

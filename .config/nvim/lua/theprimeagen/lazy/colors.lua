@@ -13,7 +13,7 @@ function ColorMyPencils(color)
 
     ---vim.api.nvim_set_hl(0, 'Search', { bg = '#4a4a4a' })
 
-    ---vim.api.nvim_set_hl(0, "TSFuncMacro", { fg = "#e5b567" })
+    vim.api.nvim_set_hl(0, "TSFuncMacro", { fg = "#e5b567" })
     ---vim.api.nvim_set_hl(0, "Comment", { fg = '#54706f', italic = true })
 end
 
@@ -103,6 +103,68 @@ return {
     },
 
     {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        config = function()
+            vim.cmd("colorscheme rose-pine")
+        end,
+
+        styles = {
+            bold = true,
+            italic = true,
+            transparency = false,
+        },
+
+        groups = {
+            border = "muted",
+            link = "iris",
+            panel = "surface",
+
+            error = "love",
+            hint = "iris",
+            info = "foam",
+            note = "pine",
+            todo = "rose",
+            warn = "gold",
+
+            git_add = "foam",
+            git_change = "rose",
+            git_delete = "love",
+            git_dirty = "rose",
+            git_ignore = "muted",
+            git_merge = "iris",
+            git_rename = "pine",
+            git_stage = "iris",
+            git_text = "rose",
+            git_untracked = "subtle",
+
+            h1 = "iris",
+            h2 = "foam",
+            h3 = "rose",
+            h4 = "gold",
+            h5 = "pine",
+            h6 = "foam",
+        },
+
+        palette = {
+            -- Override the builtin palette per variant
+            -- moon = {
+            --     base = '#18191a',
+            --     overlay = '#363738',
+            -- },
+        },
+
+        -- NOTE: Highlight groups are extended (merged) by default. Disable this
+        -- per group via `inherit = false`
+        highlight_groups = {
+            Comment = { fg = "foam" },
+            -- StatusLine = { fg = "love", bg = "love", blend = 15 },
+            -- VertSplit = { fg = "muted", bg = "muted" },
+            -- Visual = { fg = "base", bg = "text", inherit = false },
+        },
+    },
+
+    {
         "RRethy/base16-nvim",
         config = function()
             require('base16-colorscheme').setup({
@@ -128,5 +190,5 @@ return {
 
             ColorMyPencils();
         end,
-        },
-    }
+    },
+}

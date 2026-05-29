@@ -49,7 +49,7 @@ autocmd({"BufWritePre"}, {
 autocmd('BufEnter', {
     group = ThePrimeagenGroup,
     callback = function()
-        vim.cmd.colorscheme("catppuccin")
+        vim.cmd.colorscheme("rose-pine-moon")
         ColorMyPencils()
     end
 })

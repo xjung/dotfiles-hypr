@@ -1,6 +1,5 @@
 {
     "terminal.integrated.cursorBlinking": true,
-    "workbench.colorTheme": "Rosé Pine Moon",
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#ffffff7e",
         "terminalCursor.foreground": "#ffffff34",
@@ -31,5 +30,6 @@
     "hediet.vscode-drawio.appearance": "automatic",
     "diffEditor.maxComputationTime": 0,
     "workbench.editor.empty.hint": "hidden",
-    "chat.viewSessions.orientation": "stacked"
+    "chat.viewSessions.orientation": "stacked",
+    "workbench.colorTheme": "Dark Modern"
 }

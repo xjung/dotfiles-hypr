@@ -20,16 +20,27 @@ style = 'dimmed white'
 success_symbol = '[\$](bold green)'
 error_symbol = '[\$](bold red)'
 
+[line_break]
+# disabled = true
+
 [package]
 disabled = true
 
+[git_branch]
+format = '\([$branch(:$remote_branch)]($style)\) '
+ignore_branches = ['master', 'main']
+
 [git_status]
-format = '([\($all_status$ahead_behind\)]($style)) '
+format = '([\[$all_status$ahead_behind\]]($style) )'
 style = 'cyan'
+disabled = true
 
 [cmd_duration]
 format = '[$duration]($style) '
 style = 'yellow'
+# show_milliseconds = true
+# show_notifications = true
+min_time_to_notify = 900_000
 
 [rust]
 symbol = 'rust '

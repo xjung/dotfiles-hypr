@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+#
+# zellij-sessionizer - fuzzy-pick a project directory and open a zellij session
+# for it. The session is named after the directory, so picking the same project
+# twice attaches to the session you already have instead of making a new one.
+#
+# The first time a session is created it is built from a layout, looked up in
+# this order:
+#
+#   <project>/.zellij.kdl                    layout kept with the project
+#   <project>/.zellij/layout.kdl             ... same, if you prefer a directory
+#   ~/.config/zellij/layouts/<session>.kdl   ... same, kept out of the repo
+#   ~/.config/zellij/layouts/project.kdl     fallback used by every project
+#
+# Where projects are searched for is configured in
+# ~/.config/zellij-sessionizer/projects.
+#
+# Usage: zellij-sessionizer [-f|--fresh] [<directory>]
+
+set -euo pipefail
+
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+projects_file="$config_home/zellij-sessionizer/projects"
+layout_dir="$config_home/zellij/layouts"
+fallback_layout="$layout_dir/project.kdl"
+
+usage() {
+    awk 'NR > 2 { if ($0 !~ /^#/) exit; sub(/^# ?/, ""); print }' "$0"
+}
+
+fresh=0
+target=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -f | --fresh) fresh=1 ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -*)
+            printf 'zellij-sessionizer: unknown option %s\n' "$1" >&2
+            exit 2
+            ;;
+        *) target=$1 ;;
+    esac
+    shift
+done
+
+# Every directory that should show up in the picker, one per line.
+list_projects() {
+    local root depth
+    if [[ -f $projects_file ]]; then
+        cat -- "$projects_file"
+    else
+        printf '%s 1\n' "$HOME/dev"
+    fi |
+        while read -r root depth _; do
+            [[ -z $root || $root == '#'* ]] && continue
+            root=${root/#\~/$HOME}
+            root=${root%/}
+            [[ -d $root ]] || continue
+            depth=${depth:-1}
+            if [[ $depth == 0 ]]; then
+                printf '%s\n' "$root"
+            else
+                find "$root" -mindepth "$depth" -maxdepth "$depth" \
+                    -type d -not -name '.*' -print 2>/dev/null
+            fi
+        done | sort -u
+}
+
+# Zellij session names end up as file names, so keep them to a safe alphabet.
+session_name() {
+    local name=${1##*/}
+    printf '%s\n' "${name//[^A-Za-z0-9_-]/-}"
+}
+
+# Prints the first layout that exists, or nothing.
+find_layout() {
+    local dir=$1 name=$2 candidate
+    for candidate in \
+        "$dir/.zellij.kdl" \
+        "$dir/.zellij/layout.kdl" \
+        "$layout_dir/$name.kdl" \
+        "$fallback_layout"; do
+        if [[ -f $candidate ]]; then
+            printf '%s\n' "$candidate"
+            return
+        fi
+    done
+}
+
+# Prints "live", "exited" (killed but resurrectable) or nothing.
+session_state() {
+    zellij list-sessions --no-formatting 2>/dev/null |
+        awk -v name="$1" '$1 == name { print (index($0, "EXITED") ? "exited" : "live"); exit }' ||
+        true
+}
+
+if [[ -n $target ]]; then
+    project_dir=$target
+else
+    project_dir=$(list_projects | fzf --prompt 'project> ' --reverse --border) || exit 0
+fi
+[[ -n $project_dir ]] || exit 0
+
+if [[ ! -d $project_dir ]]; then
+    printf 'zellij-sessionizer: not a directory: %s\n' "$project_dir" >&2
+    exit 1
+fi
+project_dir=$(cd -- "$project_dir" && pwd -P)
+
+name=$(session_name "$project_dir")
+state=$(session_state "$name")
+
+if ((fresh)) && [[ -n $state ]]; then
+    zellij delete-session --force "$name" >/dev/null 2>&1 || true
+    state=""
+fi
+
+layout=$(find_layout "$project_dir" "$name")
+
+# Inside zellij a client cannot attach to a second session, but it can be moved
+# to one - and switch-session creates the session if it does not exist yet.
+if [[ -n ${ZELLIJ:-} ]]; then
+    if [[ -n $state ]]; then
+        exec zellij action switch-session "$name"
+    elif [[ -n $layout ]]; then
+        exec zellij action switch-session --cwd "$project_dir" --layout "$layout" "$name"
+    else
+        exec zellij action switch-session --cwd "$project_dir" "$name"
+    fi
+fi
+
+# Outside zellij. Panes in a layout that declare no cwd of their own inherit the
+# one zellij was started in, which is what lets a single layout serve every
+# project.
+cd -- "$project_dir"
+if [[ -n $state ]]; then
+    exec zellij attach "$name"
+elif [[ -n $layout ]]; then
+    exec zellij --session "$name" --new-session-with-layout "$layout"
+else
+    exec zellij --session "$name"
+fi

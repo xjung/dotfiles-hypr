@@ -10,6 +10,13 @@ export TERMINAL=kitty
 export EDITOR=nvim
 # Default        "*?_-.[]~=/&;!#$%^(){}<>"
 export WORDCHARS="*?_-[]~=&!#$%^(){}<>"
+export TIMEFMT=$'%J\
+user\t%U\
+system\t%S\
+cpu\t%P\
+total\t%*E\
+amem\t%K\
+mmem\t%M'
 
 # Enable color support for less
 export MANROFFOPT=-c
@@ -83,6 +90,12 @@ colors
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source <(fzf --zsh)
+
+# zellij-sessionizer: Ctrl+o picks a project and opens (or attaches to) its
+# zellij session. `bindkey -s` types the command and presses enter instead of
+# running it from a zle widget: fzf and zellij both take the terminal over, and
+# a widget would have to hand the tty back and forth to them.
+bindkey -s '^o' 'zellij-sessionizer\n'
 
 # Source local config if exists
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

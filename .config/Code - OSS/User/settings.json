@@ -31,5 +31,5 @@
     "diffEditor.maxComputationTime": 0,
     "workbench.editor.empty.hint": "hidden",
     "chat.viewSessions.orientation": "stacked",
-    "workbench.colorTheme": "Dark Modern"
+    "git.openRepositoryInParentFolders": "never"
 }

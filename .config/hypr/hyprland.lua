@@ -331,3 +331,42 @@ hl.window_rule({
     match = { class = "xdg-desktop-portal-gtk" },
     float = true,
 })
+
+----------------
+---- LAYERS ----
+----------------
+
+-- Frosted glass for mako notifications: blurs whatever sits behind the
+-- translucent card so text underneath reads as texture, not as stray words.
+hl.layer_rule({
+    name  = "mako-blur",
+    match = { namespace = "^notifications$" },
+    blur  = true,
+    ignore_alpha = 0.2,
+})
+
+-- rofi is translucent for the same reason and needs the same treatment.
+hl.layer_rule({
+    name  = "rofi-blur",
+    match = { namespace = "^rofi$" },
+    blur  = true,
+    ignore_alpha = 0.2,
+})
+
+-- wlogout names its surface "logout_dialog", not "wlogout".
+hl.layer_rule({
+    name  = "wlogout-blur",
+    match = { namespace = "^logout_dialog$" },
+    blur  = true,
+    ignore_alpha = 0.2,
+})
+
+-- waybar's islands are translucent for the same reason. Without this the
+-- wallpaper reads straight through them and the grey module text loses its
+-- contrast over a busy photo.
+hl.layer_rule({
+    name  = "waybar-blur",
+    match = { namespace = "^waybar$" },
+    blur  = true,
+    ignore_alpha = 0.2,
+})

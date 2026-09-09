@@ -1,48 +1,234 @@
+// waybar - top bar for hyprland.
+//
+// Palette follows the kitty "Bliss" theme (~/.config/kitty/Bliss.conf) with
+// EndeavourOS accents, the same one mako, rofi and wlogout already use:
+//
+//   backdrop   #16181f    purple   #a198ff
+//   text       #eaeaea    magenta  #ff95df
+//   muted      #55596d    blue     #95dfff
+//   dim text   #8b90a6    red      #ff6f8d
+//                         green    #93ff8d
+//                         yellow   #fffc9b
+//
+// Geometry mirrors hyprland (~/.config/hypr/hyprland.lua): the side margins
+// match gaps_out = 10, so the bar's edges line up with the windows below it.
+//
+// The CENTRE is the working surface and follows one rule: at rest it shows
+// only what you actually read - where you are, what time it is, which layout
+// you are typing in. Everything you merely *reach for* lives in the controls
+// drawer and slides out under the pointer, and anything that only matters
+// while it is happening (a recording indicator, the scratchpad) does not
+// exist until it is happening.
 {
     "layer": "top",
     "position": "top",
     "height": 36,
-    "spacing": 5,
+    // Gaps are done in CSS so the islands can control their own rhythm.
+    "spacing": 0,
     "margin-top": 4,
-    "margin-left": 8,
-    "margin-right": 8,
+    "margin-left": 10,
+    "margin-right": 10,
     "margin-bottom": 0,
     "output": ["eDP-1", "HDMI-A-1"],
     "reload_style_on_change": true,
-
-    "modules-center": [
-        "hyprland/workspaces",
-        "pulseaudio",
-        "pulseaudio#mic",
-        "clock#time"
-    ],
 
     "modules-left": [
         "bluetooth",
         "mpris"
     ],
 
+    "modules-center": [
+        "hyprland/workspaces",
+        "clock#time",
+        "hyprland/language",
+        "privacy",
+        "group/controls"
+    ],
+
     "modules-right": [
+        "custom/notifications",
         "tray",
         "network",
         "battery"
     ],
 
-    "hyprland/window": {
-    	"format": "{title}",
-    	"rewrite": {
-    		"(.*) - Mozilla Firefox": "🌎 $1",
-    		"(.*) - zsh": "> [$1]"
-    	}
+    // --- centre -----------------------------------------------------------
+
+    // Numbers rather than dots: they tell you which SUPER+n to press. The
+    // styling carries the state instead, so the row never changes width as
+    // you move around. 1-5 are always present; 6-10 appear once used.
+    "hyprland/workspaces": {
+        "all-outputs": true,
+        "disable-scroll": true,
+        "persistent-workspaces": {
+            "*": 5
+        },
+        // The magic scratchpad (SUPER+S) shows up only while it holds a
+        // window, which is the only time you can do anything with it.
+        "show-special": true,
+        "special-visible-only": false,
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            // SUPER+0 focuses workspace 10, so label it the way you type it.
+            "10": "0",
+            "special": "󰐃"
+        },
+        // waybar's own dispatcher - the previous hyprctl string was never
+        // valid syntax, so clicking a workspace did nothing.
+        "on-click": "activate"
     },
 
+    "clock#time": {
+        "locale": "en_GB.UTF-8",
+        // The markup opens before the brace and closes inside the strftime
+        // spec: fmt would read a leading "<" as an alignment flag.
+        "format": "<b>{:%H:%M</b> <span size='small' foreground='#8b90a6'>%a %d</span>}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "weeks-pos": "left",
+            "on-scroll": 1,
+            "format": {
+                "months":   "<span color='#eaeaea'><b>{}</b></span>",
+                "weekdays": "<span color='#a198ff'><b>{}</b></span>",
+                "weeks":    "<span color='#55596d'>W{:%V}</span>",
+                "days":     "<span color='#8b90a6'>{}</span>",
+                "today":    "<span color='#ff95df'><b><u>{}</u></b></span>"
+            }
+        },
+        "actions": {
+            // Scroll the open tooltip through the months, right-click to
+            // switch between the month and year views.
+            "on-click-right": "mode",
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        }
+    },
+
+    // kb_layout is "us,ru" (alt+shift), and until now nothing on screen said
+    // which one was live. EN stays dim because it is the resting state; RU is
+    // blue so a stray alt+shift is visible from the corner of your eye.
+    "hyprland/language": {
+        // Must stay "{}": once a format-<lang> below matches, waybar renders
+        // the main format with a single positional argument, so a named
+        // placeholder such as {short} throws "argument not found" and the
+        // module is disabled outright. Same reason there is no
+        // tooltip-format here. Any layout without its own entry falls back
+        // to the long name ("English (US)").
+        "format": "{}",
+        // Keyed on {shortDescription}, i.e. "en" / "ru".
+        "format-en": "EN",
+        "format-ru": "<span foreground='#95dfff'>RU</span>",
+        "tooltip": false,
+        "on-click": "hyprctl switchxkblayout current next"
+    },
+
+    // Renders nothing at all until something is recording. audio-out is left
+    // out on purpose: it would be lit whenever music plays.
+    "privacy": {
+        "icon-spacing": 6,
+        "icon-size": 13,
+        "transition-duration": 250,
+        "modules": [
+            {
+                "type": "screenshare",
+                "tooltip": true,
+                "tooltip-icon-size": 22
+            },
+            {
+                "type": "audio-in",
+                "tooltip": true,
+                "tooltip-icon-size": 22
+            }
+        ]
+    },
+
+    // Volume is the handle; mic, brightness and the idle inhibitor slide out
+    // to the right when the pointer lands on it.
+    "group/controls": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 350,
+            "transition-left-to-right": true,
+            "children-class": "control"
+        },
+        "modules": [
+            "pulseaudio",
+            "pulseaudio#mic",
+            "backlight",
+            "idle_inhibitor"
+        ]
+    },
+
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"],
+            "default-muted": "󰝟",
+            "headphone": "󰋋",
+            "headphone-muted": "󰟎",
+            "headset": "󰋎",
+            "headset-muted": "󰋐"
+        },
+        "tooltip-format": "{volume}%  ·  {desc}",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pavucontrol",
+        // -l 1 matches the XF86AudioRaiseVolume bind in hyprland.lua, so the
+        // bar and the media key share one ceiling.
+        "on-scroll-up": "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    },
+
+    "pulseaudio#mic": {
+        "format": "{format_source}",
+        "format-source": "󰍬",
+        "format-source-muted": "󰍭",
+        "tooltip-format": "Mic {source_volume}%  ·  {source_desc}",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-"
+    },
+
+    "backlight": {
+        "device": "amdgpu_bl1",
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "tooltip-format": "Brightness {percent}%",
+        // Same curve as the XF86MonBrightness binds in hyprland.lua.
+        "on-scroll-up": "brightnessctl -e4 -n2 set 5%+",
+        "on-scroll-down": "brightnessctl -e4 -n2 set 5%-"
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰅶",
+            "deactivated": "󰛊"
+        },
+        "tooltip-format-activated": "Idle inhibited - the screen stays awake",
+        "tooltip-format-deactivated": "Idle normal - hypridle may lock"
+    },
+
+    // --- left -------------------------------------------------------------
+
     "bluetooth": {
-    	"format": "{icon}",
-    	"format-icons": ["󰂲", "󰂯"],
-        "format-connected": " {device_alias}",
-    	"tooltip-format": "{num_connections} connected",
-    	"tooltip-format-connected": "{device_enumerate}",
-    	"tooltip-format-enumerate-connected": "{device_alias} ({device_battery_percentage}%)\t{device_address}",
+        "format": "{icon}",
+        "format-icons": ["󰂲", "󰂯"],
+        "format-connected": "󰂱 {device_alias}",
+        "tooltip-format": "{num_connections} connected",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias} ({device_battery_percentage}%)\t{device_address}",
         "on-click": "kitty --class centered bluetui"
     },
 
@@ -57,94 +243,50 @@
         "album-len": 0,
         "length-len": 0,
         "player-icons": {
-            "default": "▶",
-            "mpv": "🎵",
-            "spotify": "",
-            "firefox": "",
-            "chromium": ""
+            "default": "󰐊",
+            "mpv": "󰝚",
+            "spotify": "",
+            "firefox": "",
+            "chromium": ""
         },
         "status-icons": {
-            "paused": "⏸"
+            "paused": "󰏤"
         }
     },
 
-    "clock#time": {
-        "format": "<b>{:%H:%M</b> <span size='x-small'>%d/%m}</span>",
-        "tooltip-format": "<tt>{calendar}</tt>",
-        "locale": "en_GB.UTF-8",
-        "calendar": {
-            "mode": "month",
-            "format": {
-                "months": "<span color='#ffead4'><b>{}</b></span>",
-                "days": "<span color='#ecc6d9'>{}</span>",
-                "weeks": "<span color='#99ffdd'><b>W{:%V}</b></span>",
-                "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
-                "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
-            }
-        },
-        "actions": {
-        	"on-click-right": "mode"
-        }
+    // --- right ------------------------------------------------------------
+
+    "custom/notifications": {
+        "exec": "$HOME/.local/bin/mako-panel status",
+        "return-type": "json",
+        "interval": "once",
+        "signal": 8,
+        "tooltip": true,
+        "on-click": "$HOME/.local/bin/mako-panel show",
+        "on-click-middle": "$HOME/.local/bin/mako-panel read",
+        "on-click-right": "$HOME/.local/bin/mako-panel dnd"
     },
 
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "on-click": "hyprctl dispatch \"hl.dsp.focus({ workspace = {name} })\"",
-        "all-outputs": true,
-        "format-icons": {
-            "1": "1",
-            "2": "2",
-            "3": "3",
-            "4": "4",
-            "5": "5",
-            "6": "6",
-            "7": "7",
-            "8": "8",
-            "9": "9"
-        },
-        "format": "{name}"
+    "tray": {
+        "spacing": 6
     },
 
     "network": {
         "format-wifi": "{icon} {signalStrength}%",
         "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
-        "format-ethernet": "🖧",
-        "format-disconnected": "⚠",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤭",
         "tooltip-format": "{essid}, {gwaddr}",
         "on-click": "kitty --class centered wlctl"
     },
 
-    "pulseaudio": {
-        "format-icons": {
-			"default": [ "󰕿", "󰖀", "󰕾" ],
-			"default-muted": "󰝟",
-			"headphone": "󰋋",
-			"headphone-muted": "󰟎",
-			"headset": "󰋎",
-			"headset-muted": "󰋐"
-		},
-        "format": "{icon}",
-        "tooltip-format": "{volume}%: {desc}",
-        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-        "on-click-right": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 50%",
-        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
-        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-    },
-
-    "pulseaudio#mic": {
-        "format": "{format_source}",
-        "format-source": "󰍬",
-        "format-source-muted": "󰍭",
-        "tooltip": false,
-        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
-    },
-
-   "tray": {
-        "spacing": 5,
-    },
-
     "battery": {
+        "states": {
+            "warning": 25,
+            "critical": 12
+        },
         "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
         "format-icons": {
             "charging": "󰂄",
             "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]

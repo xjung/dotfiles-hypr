@@ -54,9 +54,14 @@ window#waybar.hidden {
 .modules-left,
 .modules-center,
 .modules-right {
-    /* Alpha matches mako and rofi; the hyprland blur layerrule does the rest. */
-    background-color: rgba(22, 24, 31, 0.90);
-    border: 1px solid #55596d;
+    /* Lighter than mako and rofi on purpose. Those are transient surfaces
+       that appear over your work and have to declare an edge; the bar is
+       always there, so a #55596d outline just traces three bright shapes
+       around the screen all day. A 5% hairline still separates the island
+       from the wallpaper without reading as a border, and the lower alpha
+       lets the hyprland blur layerrule do more of the work. */
+    background-color: rgba(22, 24, 31, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     /* rofi's window radius, so a launcher opening under the bar continues it. */
     border-radius: 12px;
     padding: 0 4px;
@@ -222,23 +227,15 @@ window#waybar.hidden {
 
 /* --- centre: controls drawer -------------------------------------------- */
 
-/* Volume is the handle; the rest slide out under the pointer. The faint
-   backing appears on hover so the drawer reads as one object while open. */
+/* A plain wrapper now that the four controls are permanent. It carries no
+   backing of its own: the group had one to read as a single object while the
+   drawer was sliding open, but with everything on the bar that would light
+   all four whenever you touched one of them. */
 #controls {
     background-color: transparent;
     border-radius: 8px;
     padding: 0;
     margin: 3px 1px;
-    transition: background-color 200ms ease;
-}
-
-#controls:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.control {
-    margin: 3px 1px;
-    padding: 0 8px;
 }
 
 /* Both audio modules share the #pulseaudio id, and waybar puts the SINK's

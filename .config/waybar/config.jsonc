@@ -13,12 +13,10 @@
 // Geometry mirrors hyprland (~/.config/hypr/hyprland.lua): the side margins
 // match gaps_out = 10, so the bar's edges line up with the windows below it.
 //
-// The CENTRE is the working surface and follows one rule: at rest it shows
-// only what you actually read - where you are, what time it is, which layout
-// you are typing in. Everything you merely *reach for* lives in the controls
-// drawer and slides out under the pointer, and anything that only matters
-// while it is happening (a recording indicator, the scratchpad) does not
-// exist until it is happening.
+// The CENTRE is the working surface: where you are, what time it is, which
+// layout you are typing in, and the controls group. Anything that only
+// matters while it is happening - a recording indicator, the scratchpad -
+// does not exist on the bar until it is happening.
 {
     "layer": "top",
     "position": "top",
@@ -42,10 +40,6 @@
         "clock#time",
         "hyprland/language",
         "privacy",
-        // Outside the drawer: mic state is worth seeing without hovering.
-        // It sits before the group so the drawer still opens at the island's
-        // right edge instead of shoving the mic around as it slides.
-        "pulseaudio#mic",
         "group/controls"
     ],
 
@@ -157,17 +151,18 @@
         ]
     },
 
-    // Volume is the handle; brightness and the idle inhibitor slide out to
-    // the right when the pointer lands on it.
+    // All four stay on the bar. Re-adding the commented "drawer" block below
+    // collapses them behind the volume icon again, revealed on hover.
     "group/controls": {
         "orientation": "horizontal",
-        "drawer": {
-            "transition-duration": 350,
-            "transition-left-to-right": true,
-            "children-class": "control"
-        },
+        // "drawer": {
+        //     "transition-duration": 350,
+        //     "transition-left-to-right": true,
+        //     "children-class": "control"
+        // },
         "modules": [
             "pulseaudio",
+            "pulseaudio#mic",
             "backlight",
             "idle_inhibitor"
         ]

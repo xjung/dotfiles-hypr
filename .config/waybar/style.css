@@ -3,17 +3,17 @@
  *
  * Bliss backdrop (#16181f) with EndeavourOS accents. The bar itself is not a
  * bar: it is three floating islands over the wallpaper, sharing the radius
- * and the 1px muted border that rofi's window and wlogout's cards already
- * use, so the desktop reads as one surface.
+ * that rofi's window and wlogout's cards already use, so the desktop reads
+ * as one surface.
  *
  * Two rules keep it legible:
  *
- *   - HOVER is always purple. It means "this one", exactly as it does for a
- *     selected rofi row and a focused wlogout button. It never means anything
- *     else, so pointing at something can never be mistaken for a state.
- *   - COLOUR is reserved for state. Red is muted or critical, yellow is
- *     "awake / running low", blue is secondary information, magenta is media.
- *     Anything at rest and behaving is grey.
+ *   - PURPLE is the accent, and hover always uses it, exactly as a selected
+ *     rofi row and a focused wlogout button do. It also marks the two things
+ *     that are currently live: the workspace you are on, and a playing track.
+ *   - Every OTHER colour is state, and only state. Red is muted or critical,
+ *     yellow is "awake / running low", blue is secondary information, magenta
+ *     is the scratchpad. Anything at rest and behaving is grey.
  *
  * GTK3 CSS, so no custom properties -- the palette is repeated literally.
  *
@@ -169,7 +169,7 @@ window#waybar.hidden {
     color: #ff6f8d;
 }
 
-/* The magic scratchpad, in media magenta because it holds a stashed window
+/* The magic scratchpad, in magenta because it holds a stashed window
    rather than a place you live in. */
 #workspaces button.special {
     color: #ff95df;
@@ -292,11 +292,17 @@ window#waybar.hidden {
     color: #55596d;
 }
 
-#mpris {
-    color: #ff95df;
+/* Class is the lowercased player status, so .playing / .paused / .stopped.
+   Playing takes the accent purple: magenta at full strength was the
+   brightest thing on the bar, and a track title is long enough that it
+   carried real weight. Only the colour is overridden, so the generic purple
+   hover tint still lands underneath. */
+#mpris.playing {
+    color: #a198ff;
 }
 
-#mpris.paused {
+#mpris.paused,
+#mpris.stopped {
     color: #55596d;
 }
 

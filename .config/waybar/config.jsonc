@@ -243,9 +243,9 @@
         "player-icons": {
             "default": "󰐊",
             "mpv": "󰝚",
-            "spotify": "",
-            "firefox": "",
-            "chromium": ""
+            "spotify": "",
+            "firefox": "",
+            "chromium": ""
         },
         "status-icons": {
             "paused": "󰏤"

@@ -42,12 +42,16 @@
         "clock#time",
         "hyprland/language",
         "privacy",
+        // Outside the drawer: mic state is worth seeing without hovering.
+        // It sits before the group so the drawer still opens at the island's
+        // right edge instead of shoving the mic around as it slides.
+        "pulseaudio#mic",
         "group/controls"
     ],
 
     "modules-right": [
-        "custom/notifications",
         "tray",
+        "custom/notifications",
         "network",
         "battery"
     ],
@@ -153,8 +157,8 @@
         ]
     },
 
-    // Volume is the handle; mic, brightness and the idle inhibitor slide out
-    // to the right when the pointer lands on it.
+    // Volume is the handle; brightness and the idle inhibitor slide out to
+    // the right when the pointer lands on it.
     "group/controls": {
         "orientation": "horizontal",
         "drawer": {
@@ -164,7 +168,6 @@
         },
         "modules": [
             "pulseaudio",
-            "pulseaudio#mic",
             "backlight",
             "idle_inhibitor"
         ]

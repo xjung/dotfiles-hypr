@@ -241,20 +241,33 @@ window#waybar.hidden {
     padding: 0 8px;
 }
 
-#pulseaudio.muted {
+/* Both audio modules share the #pulseaudio id, and waybar puts the SINK's
+   "muted" class on both of them -- so without :not(.mic) muting the speakers
+   also paints the microphone red. The mic has its own state class,
+   .source-muted, and that is the only thing allowed to colour it. */
+#pulseaudio.muted:not(.mic) {
     color: #ff6f8d;
     background-color: rgba(255, 111, 141, 0.15);
 }
 
-#pulseaudio.microphone {
+/* Always on the bar rather than in the drawer: whether the mic is open is
+   worth knowing without going looking for it. */
+#pulseaudio.mic {
     color: #8b90a6;
 }
 
-/* A muted mic is the one control whose state you need to see from across the
-   room, so it keeps its red even while the drawer is sliding shut. */
-#pulseaudio.microphone.source-muted {
+#pulseaudio.mic.source-muted {
     color: #ff6f8d;
     background-color: rgba(255, 111, 141, 0.15);
+}
+
+/* The one exception to "hover is always purple": a muted control out-weighs
+   the generic hover rule, and painting it purple would hide the mute at the
+   exact moment you are reaching for it. It deepens in its own red instead. */
+#pulseaudio.muted:not(.mic):hover,
+#pulseaudio.mic.source-muted:hover {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.28);
 }
 
 #backlight {

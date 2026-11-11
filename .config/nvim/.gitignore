@@ -1,2 +1,2 @@
-plugin/packer_compiled.lua
-
+# Parser binaries, spell files and anything else Neovim drops into the config.
+/spell/

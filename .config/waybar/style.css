@@ -1,142 +1,363 @@
+/*
+ * waybar - same palette as kitty, mako, rofi and wlogout.
+ *
+ * Bliss backdrop (#16181f) with EndeavourOS accents. The bar itself is not a
+ * bar: it is three floating islands over the wallpaper, sharing the radius
+ * that rofi's window and wlogout's cards already use, so the desktop reads
+ * as one surface.
+ *
+ * Two rules keep it legible:
+ *
+ *   - PURPLE is the accent, and hover always uses it, exactly as a selected
+ *     rofi row and a focused wlogout button do. It also marks the two things
+ *     that are currently live: the workspace you are on, and a playing track.
+ *   - Every OTHER colour is state, and only state. Red is muted or critical,
+ *     yellow is "awake / running low", blue is secondary information, magenta
+ *     is the scratchpad. Anything at rest and behaving is grey.
+ *
+ * GTK3 CSS, so no custom properties -- the palette is repeated literally.
+ *
+ *   backdrop  #16181f   dim text  #8b90a6   purple   #a198ff
+ *   text      #eaeaea   muted     #55596d   magenta  #ff95df
+ *   bright    #c7c7c7                       blue     #95dfff
+ *                                           red      #ff6f8d
+ *                                           green    #93ff8d
+ *                                           yellow   #fffc9b
+ */
+
 * {
     border: none;
     border-radius: 0;
-    font-family: "FiraCode Nerd Font";
+    /* Matches mako, rofi and wlogout; waybar was the last holdout on Fira. */
+    font-family: "JetBrainsMono Nerd Font", monospace;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13px;
     min-height: 0;
+    /* Adwaita embosses labels, which turns dim grey text muddy on a dark
+       card -- the same correction wlogout's stylesheet makes. */
+    text-shadow: none;
+    -gtk-icon-shadow: none;
 }
 
 window#waybar {
-    background: rgba(168, 101, 152, 0.0);
-    color: #ffffff;
-    border-radius: 30px;
-    transition-property: background-color;
-    transition-duration: .5s;
+    /* The islands carry the background; the bar itself is only a frame. */
+    background: transparent;
+    color: #eaeaea;
 }
 
 window#waybar.hidden {
     opacity: 0;
 }
 
-#clock.time {
-    background: rgba(30, 30, 40, 0.0);
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 0 12px;
+/* --- the islands -------------------------------------------------------- */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    /* Lighter than mako and rofi on purpose. Those are transient surfaces
+       that appear over your work and have to declare an edge; the bar is
+       always there, so a #55596d outline just traces three bright shapes
+       around the screen all day. A 5% hairline still separates the island
+       from the wallpaper without reading as a border, and the lower alpha
+       lets the hyprland blur layerrule do more of the work. */
+    background-color: rgba(22, 24, 31, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* rofi's window radius, so a launcher opening under the bar continues it. */
+    border-radius: 12px;
+    padding: 0 4px;
+    /* Vertical margins are kept tight on purpose: island + module + button
+       insets all stack, and waybar refuses to honour "height": 36 once the
+       modules ask for more than that. */
+    margin: 1px 0;
 }
 
-/* Workspaces styling */
+/* --- every module is a quiet pill until you point at it ------------------ */
+
+#workspaces,
+#clock,
+#language,
+#privacy,
+#pulseaudio,
+#backlight,
+#idle_inhibitor,
+#bluetooth,
+#mpris,
+#network,
+#battery,
+#tray,
+#custom-notifications {
+    background-color: transparent;
+    color: #8b90a6;
+    /* rofi's element radius, nested inside the island's 12px. */
+    border-radius: 8px;
+    padding: 0 8px;
+    /* Tight by default. Spacing is spent deliberately below, between groups
+       rather than between every module, so the row reads as clusters instead
+       of one evenly-spaced ribbon. */
+    margin: 3px 1px;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+
+#clock:hover,
+#language:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#idle_inhibitor:hover,
+#bluetooth:hover,
+#mpris:hover,
+#network:hover,
+#battery:hover,
+#custom-notifications:hover {
+    background-color: rgba(161, 152, 255, 0.15);
+    color: #eaeaea;
+}
+
+/* --- centre: workspaces ------------------------------------------------- */
+
+/* A faint inset track, so 1-5 read as one segmented control that the active
+   pill slides along rather than five loose numbers, and so the cluster is
+   visibly separate from the clock without needing a divider line. */
 #workspaces {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 0 4px;
-    margin: 5px 4px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: 9px;
+    padding: 0 2px;
+    margin: 3px 8px 3px 1px;
 }
 
 #workspaces button {
-    padding: 0 4px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 20px;
-    min-width: 25px;
-    box-shadow: inset 0 -3px transparent;
+    padding: 0;
+    margin: 3px 2px;
+    /* Every state carries the same base width, so the row cannot jitter as
+       you move between workspaces -- only the active pill grows. */
+    min-width: 22px;
+    border-radius: 7px;
+    background-color: transparent;
+    /* Empty and persistent: present, but not asking for attention. */
+    color: #55596d;
+    /* waybar draws an inset underline on buttons by default. */
+    box-shadow: none;
+    transition: background-color 180ms ease, color 180ms ease,
+                min-width 180ms ease;
+}
+
+/* Anything with a window on it is worth reading. */
+#workspaces button:not(.empty) {
+    color: #8b90a6;
+}
+
+/* Occupied and on screen, but on the other monitor. */
+#workspaces button.visible:not(.active) {
+    color: #c7c7c7;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background-color: rgba(161, 152, 255, 0.15);
+    color: #eaeaea;
+    box-shadow: none;
 }
 
+/* The one you are on: a purple pill that widens as it takes focus. */
 #workspaces button.active {
-    background: rgba(255, 255, 255, 0.9);
-    color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(161, 152, 255, 0.22);
+    color: #a198ff;
+    min-width: 30px;
+    font-weight: 700;
 }
 
 #workspaces button.urgent {
-    background-color: #eb4d4b;
+    background-color: rgba(255, 111, 141, 0.20);
+    color: #ff6f8d;
 }
 
-#network {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 0 8px;
-    margin: 4px 0;
+/* The magic scratchpad, in magenta because it holds a stashed window
+   rather than a place you live in. */
+#workspaces button.special {
+    color: #ff95df;
+    min-width: 26px;
 }
 
-#pulseaudio {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+#workspaces button.special.active {
+    background-color: rgba(255, 149, 223, 0.18);
+    color: #ff95df;
+}
+
+/* --- centre: clock ------------------------------------------------------ */
+
+#clock {
+    color: #eaeaea;
+    font-size: 14px;
     padding: 0 10px;
-    margin: 4px 0;
 }
 
-#pulseaudio.microphone {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+/* --- centre: keyboard layout -------------------------------------------- */
+
+/* Layout and the drawer form the "status" group at the right of the centre:
+   a wider gap opens before it, and none between its members. */
+#language {
+    font-size: 11px;
+    font-weight: 700;
     padding: 0 8px;
-    margin: 4px 0;
+    min-width: 20px;
+    margin-left: 7px;
 }
 
-#pulseaudio.microphone.source-muted {
-    background: rgba(255, 80, 80, 0.3);
-    color: #ff9999;
+/* --- centre: privacy ---------------------------------------------------- */
+
+/* Absent from the bar entirely until something is capturing. */
+#privacy {
+    padding: 0 4px;
 }
 
-#battery {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 0 8px;
-    margin: 4px 0;
+#privacy-item {
+    padding: 0 5px;
+    border-radius: 7px;
+    color: #ff6f8d;
+}
+
+/* Screen capture is a "you are being watched" warning, not an error. */
+#privacy-item.screenshare {
+    color: #fffc9b;
+    background-color: rgba(255, 252, 155, 0.14);
+}
+
+#privacy-item.audio-in {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.15);
+}
+
+/* --- centre: controls drawer -------------------------------------------- */
+
+/* A plain wrapper now that the four controls are permanent. It carries no
+   backing of its own: the group had one to read as a single object while the
+   drawer was sliding open, but with everything on the bar that would light
+   all four whenever you touched one of them. */
+#controls {
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 0;
+    margin: 3px 1px;
+}
+
+/* Both audio modules share the #pulseaudio id, and waybar puts the SINK's
+   "muted" class on both of them -- so without :not(.mic) muting the speakers
+   also paints the microphone red. The mic has its own state class,
+   .source-muted, and that is the only thing allowed to colour it. */
+#pulseaudio.muted:not(.mic) {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.15);
+}
+
+/* Always on the bar rather than in the drawer: whether the mic is open is
+   worth knowing without going looking for it. */
+#pulseaudio.mic {
+    color: #8b90a6;
+}
+
+#pulseaudio.mic.source-muted {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.15);
+}
+
+/* The one exception to "hover is always purple": a muted control out-weighs
+   the generic hover rule, and painting it purple would hide the mute at the
+   exact moment you are reaching for it. It deepens in its own red instead. */
+#pulseaudio.muted:not(.mic):hover,
+#pulseaudio.mic.source-muted:hover {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.28);
+}
+
+#backlight {
+    color: #8b90a6;
+}
+
+/* Coffee cup lit: hypridle is being held off. */
+#idle_inhibitor.activated {
+    color: #fffc9b;
+    background-color: rgba(255, 252, 155, 0.14);
+}
+
+#idle_inhibitor.deactivated {
+    color: #55596d;
+}
+
+/* --- left --------------------------------------------------------------- */
+
+#bluetooth.connected {
+    color: #95dfff;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+    color: #55596d;
+}
+
+/* Class is the lowercased player status, so .playing / .paused / .stopped.
+   Playing takes the accent purple: magenta at full strength was the
+   brightest thing on the bar, and a track title is long enough that it
+   carried real weight. Only the colour is overridden, so the generic purple
+   hover tint still lands underneath. */
+#mpris.playing {
+    color: #a198ff;
+}
+
+#mpris.paused,
+#mpris.stopped {
+    color: #55596d;
+}
+
+/* --- right -------------------------------------------------------------- */
+
+#network.disconnected {
+    color: #ff6f8d;
+}
+
+#battery.charging {
+    color: #93ff8d;
+}
+
+#battery.warning:not(.charging) {
+    color: #fffc9b;
+}
+
+#battery.critical:not(.charging) {
+    color: #ff6f8d;
+    background-color: rgba(255, 111, 141, 0.15);
+}
+
+/* Purple echoes the mako accent, so a waiting badge reads as "notification". */
+#custom-notifications.unread {
+    color: #a198ff;
+    background-color: rgba(161, 152, 255, 0.20);
+}
+
+#custom-notifications.dnd {
+    color: #55596d;
 }
 
 #tray {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 0 8px;
-    margin: 4px 0;
+    padding: 0 6px;
 }
 
-#bluetooth {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 0 10px;
-    margin: 4px 0;
+#tray > .passive {
+    -gtk-icon-effect: dim;
 }
 
-#mpris {
-    background: rgba(30, 30, 40, 1.0);
-    border-radius: 20px;
-    padding: 0 10px;
-    margin: 4px 0;
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
 }
+
+/* --- tooltips ----------------------------------------------------------- */
 
 tooltip {
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 15px;
-    padding: 10px;
+    background-color: rgba(22, 24, 31, 0.94);
+    border: 1px solid #55596d;
+    /* mako's radius: a tooltip is the same kind of transient card. */
+    border-radius: 10px;
 }
 
 tooltip label {
-    color: #ffffff;
-    font-size: 13px;
-}
-
-.modules-left {
-    background: rgba(30, 30, 40, 0.0);
-    border-radius: 15px;
-    padding: 2px 5px;
-}
-
-.modules-center {
-    background: rgba(30, 30, 40, 0.0);
-    border-radius: 15px;
-    padding: 2px 5px;
-}
-
-.modules-right {
-    background: rgba(30, 30, 40, 0.0);
-    border-radius: 15px;
-    padding: 2px 5px;
+    color: #eaeaea;
+    font-size: 12px;
+    padding: 4px;
 }

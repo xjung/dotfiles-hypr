@@ -1,0 +1,6 @@
+# Keeps this config's own Lua formatted the way it is written.
+column_width = 100
+indent_type = "Spaces"
+indent_width = 4
+quote_style = "AutoPreferDouble"
+call_parentheses = "Always"

@@ -1,50 +1,116 @@
+/*
+ * wlogout - same palette as mako, rofi and waybar.
+ *
+ * Bliss backdrop (#16181f) with EndeavourOS accents. Each action carries its
+ * own hover colour so the consequence is legible before you commit: purple for
+ * lock, blue for logout, red for shutdown. Buttons are quiet cards until
+ * focused, matching how a mako notification and a rofi row stay grey until
+ * they are the one you mean.
+ *
+ * GTK3 CSS, so no custom properties -- the palette is repeated literally.
+ */
+
 * {
-	background-image: none;
-	box-shadow: none;
+    background-image: none;
+    box-shadow: none;
+    /* Adwaita embosses button labels with a drop shadow, which turns the dim
+       unfocused text muddy against a dark card. */
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 window {
-	background-color: rgba(12, 12, 12, 0.9);
+    /* Alpha matches mako and rofi; the hyprland blur layerrule does the rest. */
+    background-color: rgba(22, 24, 31, 0.82);
 }
 
 button {
-    border-radius: 0;
-    border-color: black;
-	text-decoration-color: #FFFFFF;
-    color: #FFFFFF;
-	background-color: #1E1E1E;
-	border-style: solid;
-	border-width: 1px;
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: 25%;
+    color: #8b90a6;
+    background-color: rgba(28, 31, 40, 0.55);
+    border: 1px solid #55596d;
+    border-radius: 14px;
+    /* wlogout stretches its grid over the whole screen, which leaves three
+       actions rattling around in full-height columns. Generous margins pull
+       them back into cards floating on the dimmed desktop. Values are px
+       because GTK3 CSS has no percentage margins, and are chosen for a
+       1600x1000 logical screen; they stay square-ish at 1920x1080. */
+    margin: 150px 60px;
+
+    background-repeat: no-repeat;
+    /* GTK centres the label, so the artwork is lifted above it rather than
+       pushed apart with padding -- GTK3 CSS has no percentage padding. */
+    background-position: center 36%;
+    background-size: 22%;
+
+    outline-style: none;
+    transition: background-color 120ms ease, border-color 120ms ease,
+                color 120ms ease;
 }
 
-button:focus, button:active, button:hover {
-	background-color: #3700B3;
-	outline-style: none;
+button:hover,
+button:focus,
+button:active {
+    color: #eaeaea;
+    background-color: rgba(161, 152, 255, 0.15);
+    border-color: #a198ff;
+}
+
+/* Per-action accents. Shutdown reads as the destructive one. */
+#lock:hover, #lock:focus, #lock:active {
+    background-color: rgba(161, 152, 255, 0.15);
+    border-color: #a198ff;
+}
+
+#logout:hover, #logout:focus, #logout:active {
+    background-color: rgba(149, 223, 255, 0.15);
+    border-color: #95dfff;
+}
+
+#shutdown:hover, #shutdown:focus, #shutdown:active {
+    background-color: rgba(255, 111, 141, 0.16);
+    border-color: #ff6f8d;
+}
+
+#reboot:hover, #reboot:focus, #reboot:active {
+    background-color: rgba(255, 149, 223, 0.15);
+    border-color: #ff95df;
+}
+
+#suspend:hover, #suspend:focus, #suspend:active,
+#hibernate:hover, #hibernate:focus, #hibernate:active {
+    background-color: rgba(139, 144, 166, 0.18);
+    border-color: #8b90a6;
 }
 
 #lock {
-    background-image: image(url("/usr/share/wlogout/icons/lock.png"), url("/usr/local/share/wlogout/icons/lock.png"));
+    background-image: image(url("/usr/share/wlogout/icons/lock.png"),
+                            url("/usr/local/share/wlogout/icons/lock.png"));
 }
 
 #logout {
-    background-image: image(url("/usr/share/wlogout/icons/logout.png"), url("/usr/local/share/wlogout/icons/logout.png"));
+    background-image: image(url("/usr/share/wlogout/icons/logout.png"),
+                            url("/usr/local/share/wlogout/icons/logout.png"));
 }
 
 #suspend {
-    background-image: image(url("/usr/share/wlogout/icons/suspend.png"), url("/usr/local/share/wlogout/icons/suspend.png"));
+    background-image: image(url("/usr/share/wlogout/icons/suspend.png"),
+                            url("/usr/local/share/wlogout/icons/suspend.png"));
 }
 
 #hibernate {
-    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"), url("/usr/local/share/wlogout/icons/hibernate.png"));
+    background-image: image(url("/usr/share/wlogout/icons/hibernate.png"),
+                            url("/usr/local/share/wlogout/icons/hibernate.png"));
 }
 
 #shutdown {
-    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"), url("/usr/local/share/wlogout/icons/shutdown.png"));
+    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"),
+                            url("/usr/local/share/wlogout/icons/shutdown.png"));
 }
 
 #reboot {
-    background-image: image(url("/usr/share/wlogout/icons/reboot.png"), url("/usr/local/share/wlogout/icons/reboot.png"));
+    background-image: image(url("/usr/share/wlogout/icons/reboot.png"),
+                            url("/usr/local/share/wlogout/icons/reboot.png"));
 }

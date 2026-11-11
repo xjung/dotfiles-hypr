@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+#
+# mako-panel - waybar companion for the mako notification daemon.
+#
+# mako ships no waybar module of its own, so this provides one: it reports how
+# many notifications have arrived since you last looked, opens the history in
+# rofi, and toggles do-not-disturb.
+#
+# "Unread" is derived rather than counted. mako hands out notification ids in
+# ascending order, so remembering the highest id you have acknowledged is enough
+# to know what is new. mako restarts its ids from scratch, so a marker sitting
+# above the newest id is treated as stale and cleared instead of hiding
+# everything forever.
+#
+# Both the still-visible notifications and the expired ones are considered: a
+# notification that timed out while you were away is exactly the one you want
+# counted, and a critical one never expires at all.
+#
+# Subcommands:
+#   status   emit waybar JSON (the default)
+#   show     browse the history in rofi, then mark everything read
+#   read     mark everything read without opening anything
+#   dnd      toggle mako's do-not-disturb mode
+#   open     open the file a notification points at; called from mako on click
+#   bump     refresh waybar; called from mako's on-notify hook
+#
+# Usage: mako-panel [status|show|read|dnd|open <id>|bump]
+
+set -euo pipefail
+
+readonly waybar_signal=8
+readonly dnd_mode="do-not-disturb"
+
+readonly icon_idle="󰂚"
+readonly icon_unread="󰅸"
+readonly icon_dnd="󰂛"
+
+state_dir="${XDG_RUNTIME_DIR:-/tmp}/mako-panel"
+marker_file="$state_dir/last-read"
+
+# Ask mako for everything it knows about: what is still on screen, plus what has
+# already expired into the history buffer.
+all_notifications() {
+    printf '%s\n%s\n' "$(makoctl list -j 2>/dev/null || echo '[]')" \
+                      "$(makoctl history -j 2>/dev/null || echo '[]')" |
+        jq -s 'add // [] | unique_by(.id) | sort_by(-.id)'
+}
+
+last_read_id() {
+    [[ -r $marker_file ]] && cat "$marker_file" || echo 0
+}
+
+mark_all_read() {
+    local newest
+    newest=$(jq 'if length > 0 then .[0].id else 0 end' <<<"$1")
+    mkdir -p "$state_dir"
+    printf '%s\n' "$newest" >"$marker_file"
+}
+
+dnd_active() {
+    makoctl mode 2>/dev/null | grep -qx "$dnd_mode"
+}
+
+refresh_waybar() {
+    pkill -RTMIN+"$waybar_signal" waybar 2>/dev/null || true
+}
+
+# One rofi row per notification: app, summary, and a single-line body, followed
+# by rofi's per-row option syntax (a NUL, then key/value separated by \x1f) to
+# attach an icon. The icon name is the app's own where it gives one -- hyprshot
+# passes the screenshot itself, so those rows preview the shot -- otherwise the
+# desktop entry, otherwise the first word of the app name lowercased, which is
+# what icon themes usually key on ("Telegram Desktop" -> telegram).
+#
+# These rows must be piped straight into rofi: a NUL cannot survive being held
+# in a shell variable.
+format_rows() {
+    jq -r '.[] | [
+        .app_name // "unknown",
+        .summary  // "",
+        ((.body // "") | gsub("\\s+"; " ") | .[0:90]),
+        ((.app_icon // .desktop_entry // .app_name // "") | ascii_downcase | split(" ")[0])
+    ] | @tsv' <<<"$1" |
+    while IFS=$'\t' read -r app summary body icon; do
+        [[ -n $icon ]] || icon="dialog-information"
+        if [[ -n $body ]]; then
+            shown="$summary  —  $body"
+        else
+            shown="$summary"
+        fi
+        # The row's own text keeps the app name so typing "telegram" still
+        # narrows the list, while `display` is what gets drawn -- the icon
+        # already says which app a row came from.
+        printf '%s  ·  %s\0icon\x1f%s\x1fdisplay\x1f%s\n' "$app" "$shown" "$icon" "$shown"
+    done
+}
+
+cmd_status() {
+    local notifications unread newest marker text tooltip class
+
+    notifications=$(all_notifications)
+    newest=$(jq 'if length > 0 then .[0].id else 0 end' <<<"$notifications")
+    marker=$(last_read_id)
+
+    # mako restarted and rewound its ids: the old marker can only mislead.
+    if (( marker > newest )); then
+        marker=0
+        printf '0\n' >"$marker_file"
+    fi
+
+    unread=$(jq --argjson seen "$marker" '[.[] | select(.id > $seen)] | length' <<<"$notifications")
+
+    if dnd_active; then
+        class="dnd"
+        text="$icon_dnd"
+        (( unread > 0 )) && text="$icon_dnd $unread"
+    elif (( unread > 0 )); then
+        class="unread"
+        text="$icon_unread $unread"
+    else
+        class="idle"
+        text="$icon_idle"
+    fi
+
+    if (( unread > 0 )); then
+        tooltip=$(jq -r --argjson seen "$marker" \
+            '[.[] | select(.id > $seen)][0:5][]
+             | "<b>\(.app_name // "unknown")</b>  \(.summary // "")"' <<<"$notifications")
+        (( unread > 5 )) && tooltip+=$'\n'"and $(( unread - 5 )) more"
+    else
+        tooltip="No new notifications"
+    fi
+    dnd_active && tooltip+=$'\n'"<i>do not disturb</i>"
+
+    jq -nc --arg text "$text" --arg tooltip "$tooltip" --arg class "$class" \
+        '{text: $text, tooltip: $tooltip, class: $class, alt: $class}'
+}
+
+cmd_show() {
+    local notifications choice body
+
+    notifications=$(all_notifications)
+
+    if [[ $(jq length <<<"$notifications") -eq 0 ]]; then
+        rofi -e "No notifications yet." >/dev/null 2>&1 || true
+        return
+    fi
+
+    # -format i gives the index of the row, which maps straight back onto the
+    # JSON array without having to parse the rendered text again.
+    choice=$(format_rows "$notifications" |
+        rofi -dmenu -i -p "Notifications" -format i || true)
+
+    # Opening the list is the acknowledgement, whether or not a row was picked.
+    mark_all_read "$notifications"
+    refresh_waybar
+
+    if [[ -n $choice ]]; then
+        body=$(jq -r --argjson i "$choice" '.[$i] | (.body // .summary // "")' <<<"$notifications")
+        [[ -n $body ]] && printf '%s' "$body" | wl-copy
+    fi
+}
+
+# Open the file a notification points at. mako exports the clicked
+# notification's id as $id, and hyprshot passes the screenshot's path as the
+# notification icon, so that is where the path comes from. Bound per-app in the
+# mako config rather than globally, because plenty of apps set an icon that is
+# an avatar or a logo rather than something worth opening.
+cmd_open() {
+    local id="${1:-}" path
+    [[ -n $id ]] || return 0
+
+    path=$(all_notifications | jq -r --argjson i "$id" \
+        '.[] | select(.id == $i) | .app_icon // ""')
+
+    # setsid so the viewer outlives mako's short-lived shell.
+    [[ -f $path ]] && setsid gio open "$path" >/dev/null 2>&1 &
+
+    makoctl dismiss -n "$id" >/dev/null 2>&1 || true
+}
+
+cmd_read() {
+    mark_all_read "$(all_notifications)"
+    refresh_waybar
+}
+
+cmd_dnd() {
+    makoctl mode -t "$dnd_mode" >/dev/null
+    refresh_waybar
+}
+
+case "${1:-status}" in
+    status) cmd_status ;;
+    show)   cmd_show ;;
+    read)   cmd_read ;;
+    dnd)    cmd_dnd ;;
+    open)   cmd_open "${2:-}" ;;
+    bump)   refresh_waybar ;;
+    *)      printf 'usage: %s [status|show|read|dnd|open <id>|bump]\n' "${0##*/}" >&2; exit 1 ;;
+esac

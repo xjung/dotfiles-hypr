@@ -1,4 +1,124 @@
-background-color=#606060
+# mako - notification daemon
+#
+# Palette follows the kitty "Bliss" theme (~/.config/kitty/Bliss.conf) with
+# EndeavourOS accents: purple -> magenta -> blue over a near-black backdrop.
+#
+#   backdrop   #16181f    purple   #a198ff
+#   text       #eaeaea    magenta  #ff95df
+#   muted      #55596d    blue     #95dfff
+#   dim text   #8b90a6    red      #ff6f8d
+#
+# Geometry mirrors hyprland (rounding 8, gaps_out 10) and waybar
+# (top bar, height 36 + margin-top 4).
 
-border-size=0
-border-radius=8
+# --- global -------------------------------------------------------------
+
+sort=-time
+max-visible=4
+layer=overlay
+anchor=top-right
+
+font=JetBrainsMono Nerd Font Propo 10
+markup=1
+actions=1
+format=<b>%s</b>\n<span foreground="#8b90a6">%b</span>
+text-alignment=left
+
+width=380
+height=180
+outer-margin=0,2,0,0
+margin=6
+padding=12,14
+
+background-color=#16181ff0
+text-color=#eaeaea
+border-size=1
+border-color=#55596d
+border-radius=10
+progress-color=over #a198ff33
+
+icons=1
+icon-location=left
+max-icon-size=48
+icon-border-radius=6
+
+default-timeout=12000
+ignore-timeout=0
+
+history=1
+max-history=30
+
+group-by=app-name
+
+on-button-left=invoke-action default
+on-button-middle=dismiss
+on-button-right=exec makoctl dismiss --all
+on-touch=dismiss
+on-notify=exec /home/andrey/.local/bin/mako-panel bump
+
+# --- grouped ------------------------------------------------------------
+
+[grouped]
+format=<b>%s</b>  <span foreground="#676767">%g</span>\n<span foreground="#8b90a6">%b</span>
+
+# --- urgency (low/normal; critical is re-applied last so it always wins) -
+
+[urgency=low]
+border-color=#3a3d4d
+text-color=#b7bccb
+default-timeout=8000
+
+[urgency=normal]
+border-color=#55596d
+
+# --- apps ---------------------------------------------------------------
+
+# Claude Code speaks through the terminal, so it arrives as app-name "kitty".
+[app-name=kitty]
+border-color=#a198ff
+
+# Claude Desktop (com.anthropic.Claude), plus its notify-send fallback.
+[app-name=Claude]
+border-color=#a198ff
+
+[desktop-entry=com.anthropic.Claude]
+border-color=#a198ff
+
+[app-name="Telegram Desktop"]
+border-color=#95dfff
+
+[desktop-entry=org.telegram.desktop]
+border-color=#95dfff
+
+[app-name=Firefox]
+border-color=#ff95df
+
+[desktop-entry=firefox]
+border-color=#ff95df
+
+# Hyprshot passes the screenshot itself as the icon: give it room to breathe
+# and stay chromatically neutral so the thumbnail carries the color.
+[app-name=Hyprshot]
+border-color=#c7c7c7
+max-icon-size=110
+height=220
+default-timeout=8000
+# hyprshot sends its own -t 5000, which would otherwise win over the timeout
+# above; ignoring it keeps the card up long enough to actually click.
+ignore-timeout=1
+# Left-click opens the shot itself. hyprshot passes the file path as the
+# notification icon, so the handler has somewhere to read it from.
+on-button-left=exec $HOME/mako-panel open "$id"
+
+# --- critical (last: overrides any app accent) ---------------------------
+
+[urgency=critical]
+background-color=#1f1720ee
+border-color=#ff6f8d
+text-color=#ffffff
+default-timeout=0
+
+# --- do-not-disturb: makoctl mode -t do-not-disturb ---------------------
+
+[mode=do-not-disturb]
+invisible=1

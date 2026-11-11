@@ -1,0 +1,142 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "FiraCode Nerd Font";
+    font-weight: 500;
+    font-size: 14px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(168, 101, 152, 0.0);
+    color: #ffffff;
+    border-radius: 30px;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+window#waybar.hidden {
+    opacity: 0;
+}
+
+#clock.time {
+    background: rgba(30, 30, 40, 0.0);
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 12px;
+}
+
+/* Workspaces styling */
+#workspaces {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 4px;
+    margin: 5px 4px;
+}
+
+#workspaces button {
+    padding: 0 4px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 20px;
+    min-width: 25px;
+    box-shadow: inset 0 -3px transparent;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#workspaces button.active {
+    background: rgba(255, 255, 255, 0.9);
+    color: rgba(0, 0, 0, 0.9);
+}
+
+#workspaces button.urgent {
+    background-color: #eb4d4b;
+}
+
+#network {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 8px;
+    margin: 4px 0;
+}
+
+#pulseaudio {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 10px;
+    margin: 4px 0;
+}
+
+#pulseaudio.microphone {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 8px;
+    margin: 4px 0;
+}
+
+#pulseaudio.microphone.source-muted {
+    background: rgba(255, 80, 80, 0.3);
+    color: #ff9999;
+}
+
+#battery {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 8px;
+    margin: 4px 0;
+}
+
+#tray {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 8px;
+    margin: 4px 0;
+}
+
+#bluetooth {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0 10px;
+    margin: 4px 0;
+}
+
+#mpris {
+    background: rgba(30, 30, 40, 1.0);
+    border-radius: 20px;
+    padding: 0 10px;
+    margin: 4px 0;
+}
+
+tooltip {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+tooltip label {
+    color: #ffffff;
+    font-size: 13px;
+}
+
+.modules-left {
+    background: rgba(30, 30, 40, 0.0);
+    border-radius: 15px;
+    padding: 2px 5px;
+}
+
+.modules-center {
+    background: rgba(30, 30, 40, 0.0);
+    border-radius: 15px;
+    padding: 2px 5px;
+}
+
+.modules-right {
+    background: rgba(30, 30, 40, 0.0);
+    border-radius: 15px;
+    padding: 2px 5px;
+}
